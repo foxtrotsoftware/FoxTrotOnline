@@ -1,4 +1,18 @@
-CREATE TABLE `acctbal` (
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Server version:               5.7.23-log - MySQL Community Server (GPL)
+-- Server OS:                    Win32
+-- HeidiSQL Version:             9.5.0.5282
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+-- Dumping structure for table lafferty_jjixgbv9my802728.acctbal
+CREATE TABLE IF NOT EXISTS `acctbal` (
   `acctBalID` int(11) NOT NULL AUTO_INCREMENT,
   `cli_no` varchar(11) DEFAULT NULL,
   `cli_name` varchar(50) DEFAULT NULL,
@@ -13,9 +27,11 @@ CREATE TABLE `acctbal` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`acctBalID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `acctpos` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.acctpos
+CREATE TABLE IF NOT EXISTS `acctpos` (
   `acctPosID` int(11) NOT NULL AUTO_INCREMENT,
   `source` varchar(3) DEFAULT NULL,
   `rep_no` int(11) DEFAULT NULL,
@@ -48,9 +64,11 @@ CREATE TABLE `acctpos` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`acctPosID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `branches` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.branches
+CREATE TABLE IF NOT EXISTS `branches` (
   `branchID` int(11) NOT NULL AUTO_INCREMENT,
   `branch_no` varchar(5) DEFAULT NULL,
   `branch_name` varchar(50) DEFAULT NULL,
@@ -58,9 +76,11 @@ CREATE TABLE `branches` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime NOT NULL,
   PRIMARY KEY (`branchID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `clearing` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.clearing
+CREATE TABLE IF NOT EXISTS `clearing` (
   `clearID` int(11) NOT NULL AUTO_INCREMENT,
   `cli_no` varchar(11) DEFAULT NULL,
   `clearing` varchar(20) DEFAULT NULL,
@@ -70,9 +90,11 @@ CREATE TABLE `clearing` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`clearID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `clients` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.clients
+CREATE TABLE IF NOT EXISTS `clients` (
   `clientsID` int(11) NOT NULL AUTO_INCREMENT,
   `cli_no` varchar(11) DEFAULT NULL,
   `dateCreated` datetime DEFAULT NULL,
@@ -93,8 +115,8 @@ CREATE TABLE `clients` (
   `soc_sec` varchar(11) DEFAULT NULL,
   `employer` varchar(40) DEFAULT NULL,
   `empaddr` varchar(40) DEFAULT NULL,
-  `nocontact` tinyint(1) DEFAULT NULL,
-  `customerID` int(11) NOT NULL,
+  `nocontact` char(1) DEFAULT NULL,
+  `customerID` int(11) DEFAULT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   `addr2` varchar(30) DEFAULT NULL,
   `longname` varchar(200) DEFAULT NULL,
@@ -113,11 +135,13 @@ CREATE TABLE `clients` (
   `m_state` varchar(2) DEFAULT NULL,
   `m_zip` varchar(10) DEFAULT NULL,
   `open_date` datetime DEFAULT NULL,
-  `email` varchar(50) DEFAULT NULL
+  `email` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`clientsID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=8192 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `clipol` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.clipol
+CREATE TABLE IF NOT EXISTS `clipol` (
   `clipolID` int(11) NOT NULL AUTO_INCREMENT,
   `cli_no` varchar(11) DEFAULT NULL,
   `policy` varchar(20) DEFAULT NULL,
@@ -139,9 +163,11 @@ CREATE TABLE `clipol` (
   `customerid` int(11) DEFAULT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`clipolID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `clisuit` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.clisuit
+CREATE TABLE IF NOT EXISTS `clisuit` (
   `clisuitID` int(11) NOT NULL AUTO_INCREMENT,
   `cli_no` varchar(11) DEFAULT NULL,
   `income` int(11) DEFAULT NULL,
@@ -200,17 +226,21 @@ CREATE TABLE `clisuit` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`clisuitID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `company` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.company
+CREATE TABLE IF NOT EXISTS `company` (
   `companyID` int(11) NOT NULL AUTO_INCREMENT,
   `company` varchar(35) NOT NULL,
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`companyID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `customers` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.customers
+CREATE TABLE IF NOT EXISTS `customers` (
   `customerID` int(11) NOT NULL AUTO_INCREMENT,
   `customerName` varchar(200) NOT NULL,
   `webpath` varchar(50) NOT NULL,
@@ -239,26 +269,32 @@ CREATE TABLE `customers` (
   `fileProcessed_clipol` tinyint(1) DEFAULT NULL,
   `fileProcessed_clisuit` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`customerID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `importlog` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.importlog
+CREATE TABLE IF NOT EXISTS `importlog` (
   `importID` int(11) NOT NULL AUTO_INCREMENT,
   `customerID` int(11) NOT NULL,
   `success` tinyint(1) NOT NULL,
   `message` varchar(500) DEFAULT NULL,
   `logDateTime` datetime NOT NULL,
   PRIMARY KEY (`importID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `invest` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.invest
+CREATE TABLE IF NOT EXISTS `invest` (
   `investID` int(11) NOT NULL AUTO_INCREMENT,
   `invest` varchar(35) NOT NULL,
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`investID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `permrep` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.permrep
+CREATE TABLE IF NOT EXISTS `permrep` (
   `permRepID` int(11) NOT NULL AUTO_INCREMENT,
   `rep_no` int(11) DEFAULT NULL,
   `clear_no` varchar(5) DEFAULT NULL,
@@ -275,7 +311,7 @@ CREATE TABLE `permrep` (
   `m_city` varchar(24) DEFAULT NULL,
   `m_state` varchar(2) DEFAULT NULL,
   `m_zip` varchar(50) DEFAULT NULL,
-  `w_phone` varchar(13) DEFAULT NULL,
+  `m_phone` varchar(13) DEFAULT NULL,
   `h_phone` varchar(13) DEFAULT NULL,
   `fax` varchar(13) DEFAULT NULL,
   `soc_sec` varchar(11) DEFAULT NULL,
@@ -329,17 +365,25 @@ CREATE TABLE `permrep` (
   `sal_no` varchar(20) DEFAULT NULL,
   `username` varchar(50) DEFAULT NULL,
   `accessLevel` tinyint(4) DEFAULT NULL,
-  `customerID` int(11) NOT NULL,
+  `customerID` varchar(10) DEFAULT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
+  `mgr_rep` tinyint(1) DEFAULT NULL,
   `bnd_states` char(54) DEFAULT NULL,
   `opt_states` char(54) DEFAULT NULL,
-  `rep_link` varchar(10) DEFAULT NULL,
   `osjmgr` int(11) DEFAULT NULL,
   `osjmgr2` int(11) DEFAULT NULL,
+  `u5rep` int(11) DEFAULT NULL,
+  `u5plus` int(11) DEFAULT NULL,
+  `clear_no2` varchar(10) DEFAULT NULL,
+  `clear_no3` varchar(10) DEFAULT NULL,
+  `brchmgr` char(1) DEFAULT NULL,
+  `rep_link` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`permRepID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `prodtype` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.prodtype
+CREATE TABLE IF NOT EXISTS `prodtype` (
   `prodtypeID` int(11) NOT NULL AUTO_INCREMENT,
   `product` varchar(35) NOT NULL,
   `abbrev` varchar(3) DEFAULT NULL,
@@ -347,81 +391,98 @@ CREATE TABLE `prodtype` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`prodtypeID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `states` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.states
+CREATE TABLE IF NOT EXISTS `states` (
   `stateid` int(11) NOT NULL AUTO_INCREMENT,
   `statename` varchar(30) NOT NULL,
   `stateabbrev` varchar(3) NOT NULL,
   `bitIndex` int(11) DEFAULT NULL,
   PRIMARY KEY (`stateid`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS trades(
-	tradesID INT AUTO_INCREMENT NOT NULL,
-	trade_no INT NOT NULL,
-	dateTrade DATETIME NOT NULL,
-	set_date DATETIME NULL,
-	cli_no VARCHAR(11) NULL,
-	cli_name VARCHAR(40) NULL,
-	invest VARCHAR(50) NULL,
-	inv_no INT NULL,
-	net_amt DECIMAL(13, 2) NULL,
-	comm_exp DECIMAL(9, 2) NULL,
-	comm_rec DECIMAL(9, 2) NULL,
-	charge DECIMAL(8, 2) NULL,
-	date_rec DATETIME NULL,
-	pay_date DATETIME NULL,
-	rep_comm DECIMAL(10, 2) NULL,
-	rep_no INT NULL,
-	sal_no VARCHAR(20) NULL,
-	branch_mgr VARCHAR(40) NULL,
-	branch_no VARCHAR(50) NULL,
-	inv_type TINYINT NULL,
-	rep_name VARCHAR(40) NULL,
-	up_date DATETIME NULL,
-	hold char(1) NULL,
-	override INT NULL,
-	override2 INT NULL,
-	override3 INT NULL,
-	over_rate DECIMAL(7, 5) NULL,
-	over2_rate DECIMAL(7, 5) NULL,
-	over3_rate DECIMAL(7, 5) NULL,
-	over_comm DECIMAL(10, 2) NULL,
-	over2_comm DECIMAL(10, 2) NULL,
-	over3_comm DECIMAL(10, 2) NULL,
-	spl_rep2 INT NULL,
-	spl_rep3 INT NULL,
-	holdDate DATETIME NULL,
-	holdNote VARCHAR(25) NULL,
-	customerID INT NOT NULL,
-	lastModifiedDate DATETIME NULL,
-	spl_rep INT NULL,
-	spl_rep4 INT NULL,
-	spl_rep5 INT NULL,
-	spl_amt DECIMAL(10, 2) NULL,
-	spl_amt2 DECIMAL(10, 2) NULL,
-	spl_amt3 DECIMAL(10, 2) NULL,
-	spl_amt4 DECIMAL(10, 2) NULL,
-	spl_amt5 DECIMAL(10, 2) NULL,
-	spl_chg DECIMAL(7, 2) NULL,
-	spl_chg2 DECIMAL(7, 2) NULL,
-	spl_chg3 DECIMAL(7, 2) NULL,
-	spl_chg4 DECIMAL(7, 2) NULL,
-	spl_chg5 DECIMAL(7, 2) NULL,
-	spl_comm DECIMAL(10, 2) NULL,
-	spl2_comm DECIMAL(10, 2) NULL,
-	spl3_comm DECIMAL(10, 2) NULL,
-	spl4_comm DECIMAL(10, 2) NULL,
-	spl5_comm DECIMAL(10, 2) NULL,
-	clearing VARCHAR(20),
-	cusip_no VARCHAR(9),
-	rep_rate DECIMAL(7, 5),
-	source VARCHAR(2),
-  PRIMARY KEY (tradesID) 
-);
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.trades
+CREATE TABLE IF NOT EXISTS `trades` (
+  `tradesID` int(11) NOT NULL AUTO_INCREMENT,
+  `trade_no` int(11) NOT NULL,
+  `dateTrade` datetime NOT NULL,
+  `set_date` datetime DEFAULT NULL,
+  `cli_no` varchar(11) DEFAULT NULL,
+  `cli_name` varchar(40) DEFAULT NULL,
+  `invest` varchar(50) DEFAULT NULL,
+  `inv_no` int(11) DEFAULT NULL,
+  `net_amt` decimal(13,2) DEFAULT NULL,
+  `comm_exp` decimal(9,2) DEFAULT NULL,
+  `comm_rec` decimal(9,2) DEFAULT NULL,
+  `charge` decimal(8,2) DEFAULT NULL,
+  `date_rec` datetime DEFAULT NULL,
+  `pay_date` datetime DEFAULT NULL,
+  `rep_comm` decimal(10,2) DEFAULT NULL,
+  `rep_no` int(11) DEFAULT NULL,
+  `sal_no` varchar(20) DEFAULT NULL,
+  `branch_mgr` varchar(40) DEFAULT NULL,
+  `branch_no` varchar(50) DEFAULT NULL,
+  `inv_type` tinyint(4) DEFAULT NULL,
+  `rep_name` varchar(40) DEFAULT NULL,
+  `up_date` datetime DEFAULT NULL,
+  `hold` char(1) DEFAULT NULL,
+  `override` varchar(10) DEFAULT NULL,
+  `override2` int(11) DEFAULT NULL,
+  `override3` int(11) DEFAULT NULL,
+  `over_rate` decimal(7,5) DEFAULT NULL,
+  `over2_rate` decimal(7,5) DEFAULT NULL,
+  `over3_rate` decimal(7,5) DEFAULT NULL,
+  `over_comm` decimal(10,2) DEFAULT NULL,
+  `over2_comm` decimal(10,2) DEFAULT NULL,
+  `over3_comm` decimal(10,2) DEFAULT NULL,
+  `spl_rep2` int(11) DEFAULT NULL,
+  `spl_rep3` int(11) DEFAULT NULL,
+  `holdDate` datetime DEFAULT NULL,
+  `holdNote` varchar(25) DEFAULT NULL,
+  `customerID` varchar(10) DEFAULT NULL,
+  `lastModifiedDate` datetime DEFAULT NULL,
+  `spl_rep` varchar(10) DEFAULT NULL,
+  `spl_rep4` varchar(10) DEFAULT NULL,
+  `spl_rep5` varchar(10) DEFAULT NULL,
+  `spl_amt` varchar(10) DEFAULT NULL,
+  `spl_amt2` decimal(10,2) DEFAULT NULL,
+  `spl_amt3` decimal(10,2) DEFAULT NULL,
+  `spl_amt4` varchar(10) DEFAULT NULL,
+  `spl_amt5` varchar(10) DEFAULT NULL,
+  `spl_chg` varchar(10) DEFAULT NULL,
+  `spl_chg2` varchar(10) DEFAULT NULL,
+  `spl_chg3` varchar(10) DEFAULT NULL,
+  `spl_chg4` varchar(10) DEFAULT NULL,
+  `spl_chg5` varchar(10) DEFAULT NULL,
+  `spl_comm` varchar(10) DEFAULT NULL,
+  `spl2_comm` decimal(10,2) DEFAULT NULL,
+  `spl3_comm` decimal(10,2) DEFAULT NULL,
+  `spl4_comm` varchar(10) DEFAULT NULL,
+  `spl5_comm` varchar(10) DEFAULT NULL,
+  `clearing` varchar(20) DEFAULT NULL,
+  `cusip_no` varchar(9) DEFAULT NULL,
+  `rep_rate` decimal(7,5) DEFAULT NULL,
+  `source` varchar(2) DEFAULT NULL,
+  `bank_no` varchar(10) DEFAULT NULL,
+  `co_no` smallint(6) DEFAULT NULL,
+  `buy_sell` varchar(10) DEFAULT NULL,
+  `units` int(11) DEFAULT NULL,
+  `price` decimal(10,4) DEFAULT NULL,
+  `in_user` varchar(10) DEFAULT NULL,
+  `edit_user` varchar(10) DEFAULT NULL,
+  `post_user` varchar(10) DEFAULT NULL,
+  `batch` smallint(6) DEFAULT NULL,
+  `err_code` varchar(50) DEFAULT NULL,
+  `cancel` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`tradesID`)
+) ENGINE=InnoDB AUTO_INCREMENT=16384 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `upclient` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.upclient
+CREATE TABLE IF NOT EXISTS `upclient` (
   `upclientID` int(11) NOT NULL AUTO_INCREMENT,
   `list_no` int(11) DEFAULT NULL,
   `list_group` varchar(10) DEFAULT NULL,
@@ -429,9 +490,11 @@ CREATE TABLE `upclient` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`upclientID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `upclienta` (
+-- Data exporting was unselected.
+-- Dumping structure for table lafferty_jjixgbv9my802728.upclienta
+CREATE TABLE IF NOT EXISTS `upclienta` (
   `upclientaID` int(11) NOT NULL AUTO_INCREMENT,
   `fieldname` varchar(10) DEFAULT NULL,
   `list_group` varchar(10) DEFAULT NULL,
@@ -439,4 +502,9 @@ CREATE TABLE `upclienta` (
   `customerID` int(11) NOT NULL,
   `lastModifiedDate` datetime DEFAULT NULL,
   PRIMARY KEY (`upclientaID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -93,7 +93,7 @@ require_once 'header.php';
 					$( document ).ready( function(){
 						var currentDate = new Date();
 						var current_minutes = ('0'+ currentDate.getMinutes()).slice(-2);
-						var top_massage = 'Created: ' + currentDate.getMonth() + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + current_minutes;
+						var top_massage = 'Created: ' + (currentDate.getMonth()+1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + current_minutes;
 						const months_names = ["January", "February", "March", "April", "May", "June",
 							"July", "August", "September", "October", "November", "December"
 						];

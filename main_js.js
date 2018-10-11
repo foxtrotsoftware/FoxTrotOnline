@@ -32,7 +32,7 @@ $( document ).ready( function(){
 					$( "#activity_table tbody" ).html( json_obj.data_arr['activity_table'] );
 
 					var currentDate = new Date();
-					var top_massage = 'Created: ' + currentDate.getMonth() + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
+					var top_massage = 'Created: ' + (currentDate.getMonth()+1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
 					const months_names = ["January", "February", "March", "April", "May", "June",
 						"July", "August", "September", "October", "November", "December"
 					];
@@ -91,6 +91,158 @@ $( document ).ready( function(){
 			} );
 		}else{
 			$( '.dates_form input[type=date]' ).prop( "disabled", false );
+		}
+	} );
+
+    //Trade reports form filter
+    $( '#trade_reports_all_dates_checkbox' ).click( function(){
+		var is_checked = $( '#trade_reports_all_dates_checkbox' )["0"].checked;  //if true - means it became checked after clicking,
+		if( is_checked == true ){
+		  //console.log('hiii');
+			$( '.trades_date_form input[type=date]' ).prop( "disabled", true );
+			$.post( 'junction.php', $( '#trade_reports_form' ).serialize(), function( data ){
+				var json_obj = $.parseJSON( data );
+				if( json_obj.status == true ){
+					$( "#trade_reports_table" ).DataTable().destroy();
+					$( "#trade_reports_table tbody" ).html( json_obj.data_arr['trade_reports_table'] );
+
+					var currentDate = new Date();
+					var top_massage = 'Created: ' + (currentDate.getMonth()+1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
+					const months_names = ["January", "February", "March", "April", "May", "June",
+						"July", "August", "September", "October", "November", "December"
+					];
+					var file_name = 'Transaction On Hold ' + currentDate.getDate() + ' ' + months_names[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+					var pdf_title = json_obj.data_arr.pdf_title_first_line + '\n\r' + json_obj.data_arr.pdf_title_second_line;
+					var excel_title = json_obj.data_arr.pdf_title_first_line + ' - ' + json_obj.data_arr.pdf_title_second_line;
+					$( '#trade_reports_table' ).DataTable( {
+						language: {search: ""},
+						paging: false,
+						info: false,
+						dom: 'Bfrtip',
+						buttons: [
+							{
+								extend: 'excelHtml5',
+								orientation: 'landscape',
+								filename: file_name,
+								messageTop: top_massage,
+								title: excel_title
+							},
+							{
+								extend: 'pdfHtml5',
+								orientation: 'landscape',
+								filename: file_name,
+								messageTop: top_massage,
+								title: pdf_title
+							}
+						],
+						"order": [[ 0, "desc" ]],
+						"scrollX": true
+					} );
+
+					$( '.buttons-html5' ).addClass( 'btn btn-secondary' );
+					$( '#trade_reports_table_filter input' ).addClass( 'form-control' ).attr( "placeholder", "Search" ).css( 'margin', 0 );
+					$( '#trade_reports_table_filter' ).width( 210 ).css( 'float', 'right' );
+					$( '.dt-buttons' ).width( 200 ).css( 'float', 'left' );
+					if( $( document ).width() < 992 ){
+						$( '#trade_reports_table_filter' ).width( '100%' ).addClass( 'text-left mt-2' );
+						$( '#trade_reports_table_filter input' ).width( '100%' );
+					}
+
+					// $( '#activity_table_filter label' ).after( '<small id="search_note" class="form-text text-muted" style="margin-top: -0.5em">Enter EXACTLY what you\'re looking for</small>' );
+
+					//$( "#trade_reports_boxes_container_div" ).html( json_obj.data_arr['trade_reports_boxes'] );
+					$( ".server_response_div .alert" ).removeClass( 'alert-warning alert-danger' ).addClass( 'alert-success' ).text( 'Table generated successfully.' ).show();
+				}else{ //If there is an error
+					$( ".server_response_div .alert" ).text( json_obj.error_message ).show();
+					if( json_obj.error_level == 0 ){
+						$( ".server_response_div .alert" ).removeClass( 'alert-success alert-danger' ).addClass( 'alert-warning' );
+					}else{
+						$( ".server_response_div .alert" ).removeClass( 'alert-success alert-warning' ).addClass( 'alert-danger' );
+					}
+				}
+				window.setTimeout(function() {
+					$(".alert-success, .alert-danger, .alert-warning").slideUp();
+				}, 4000);
+			} );
+		}else{
+			$( '.trades_date_form input[type=date]' ).prop( "disabled", false );
+            //console.log($( '.dates_form input[type=date]' ));
+		}
+	} );
+    
+    //YTD reports form filter
+    $( '#ytd_earnings_all_dates_checkbox' ).click( function(){
+		var is_checked = $( '#ytd_earnings_all_dates_checkbox' )["0"].checked;  //if true - means it became checked after clicking,
+		if( is_checked == true ){
+		  
+			$( '.ytd_date_form input[type=date]' ).prop( "disabled", true );
+			$.post( 'junction.php', $( '#ytd_earnings_form' ).serialize(), function( data ){
+				var json_obj = $.parseJSON( data );
+				if( json_obj.status == true ){
+					$( "#ytd_earnings_reports_table" ).DataTable().destroy();
+					$( "#ytd_earnings_reports_table tbody" ).html( json_obj.data_arr['ytd_earnings_reports_table'] );
+
+					var currentDate = new Date();
+					var top_massage = 'Created: ' + (currentDate.getMonth()+1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
+					const months_names = ["January", "February", "March", "April", "May", "June",
+						"July", "August", "September", "October", "November", "December"
+					];
+					var file_name = 'Year to Date Earnings ' + currentDate.getDate() + ' ' + months_names[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+					var pdf_title = json_obj.data_arr.pdf_title_first_line + '\n\r' + json_obj.data_arr.pdf_title_second_line;
+					var excel_title = json_obj.data_arr.pdf_title_first_line + ' - ' + json_obj.data_arr.pdf_title_second_line;
+					$( '#ytd_earnings_reports_table' ).DataTable( {
+						language: {search: ""},
+						paging: false,
+						info: false,
+						dom: 'Bfrtip',
+						buttons: [
+							{
+								extend: 'excelHtml5',
+								orientation: 'landscape',
+								filename: file_name,
+								messageTop: top_massage,
+								title: excel_title
+							},
+							{
+								extend: 'pdfHtml5',
+								orientation: 'landscape',
+								filename: file_name,
+								messageTop: top_massage,
+								title: pdf_title
+							}
+						],
+						"order": [[ 0, "desc" ]],
+						"scrollX": true
+					} );
+
+					$( '.buttons-html5' ).addClass( 'btn btn-secondary' );
+					$( '#ytd_earnings_reports_table_filter input' ).addClass( 'form-control' ).attr( "placeholder", "Search" ).css( 'margin', 0 );
+					$( '#ytd_earnings_reports_table_filter' ).width( 210 ).css( 'float', 'right' );
+					$( '.dt-buttons' ).width( 200 ).css( 'float', 'left' );
+					if( $( document ).width() < 992 ){
+						$( '#ytd_earnings_reports_table_filter' ).width( '100%' ).addClass( 'text-left mt-2' );
+						$( '#ytd_earnings_reports_table_filter input' ).width( '100%' );
+					}
+ 
+					// $( '#activity_table_filter label' ).after( '<small id="search_note" class="form-text text-muted" style="margin-top: -0.5em">Enter EXACTLY what you\'re looking for</small>' );
+
+					//$( "#trade_reports_boxes_container_div" ).html( json_obj.data_arr['trade_reports_boxes'] );
+					$( ".server_response_div .alert" ).removeClass( 'alert-warning alert-danger' ).addClass( 'alert-success' ).text( 'Table generated successfully.' ).show();
+				}else{ //If there is an error
+					$( ".server_response_div .alert" ).text( json_obj.error_message ).show();
+					if( json_obj.error_level == 0 ){
+						$( ".server_response_div .alert" ).removeClass( 'alert-success alert-danger' ).addClass( 'alert-warning' );
+					}else{
+						$( ".server_response_div .alert" ).removeClass( 'alert-success alert-warning' ).addClass( 'alert-danger' );
+					}
+				}
+				window.setTimeout(function() {
+					$(".alert-success, .alert-danger, .alert-warning").slideUp();
+				}, 4000);
+			} );
+		}else{
+			$( '.ytd_date_form input[type=date]' ).prop( "disabled", false );
+            //console.log($( '.dates_form input[type=date]' ));
 		}
 	} );
 
@@ -170,7 +322,7 @@ $( document ).ready( function(){
 				$( "#activity_table tbody" ).html( json_obj.data_arr['activity_table'] );
 
 				var currentDate = new Date();
-				var top_massage = 'Created: ' + currentDate.getMonth() + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
+				var top_massage = 'Created: ' + (currentDate.getMonth()+1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
 				const months_names = ["January", "February", "March", "April", "May", "June",
 					"July", "August", "September", "October", "November", "December"
 				];
@@ -230,6 +382,145 @@ $( document ).ready( function(){
 		} );
 	} );
 
+    /**
+	 Trades Report form submit
+	 */
+	$( "#trade_reports_form" ).submit( function( event ){
+		event.preventDefault(); //Prevent the form from submitting normally
+		$.post( 'junction.php', $( '#trade_reports_form' ).serialize(), function( data ){
+			var json_obj = $.parseJSON( data );
+			if( json_obj.status == true ){
+				$( "#trade_reports_table" ).DataTable().destroy();
+				$( "#trade_reports_table tbody" ).html( json_obj.data_arr['trade_reports_table'] );
+
+				var currentDate = new Date();
+				var top_massage = 'Created: ' + (currentDate.getMonth()+1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
+				const months_names = ["January", "February", "March", "April", "May", "June",
+					"July", "August", "September", "October", "November", "December"
+				];
+				var file_name = 'Transaction On Hold ' + currentDate.getDate() + ' ' + months_names[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+				var pdf_title = json_obj.data_arr.pdf_title_first_line + '\n\r' + json_obj.data_arr.pdf_title_second_line;
+				var excel_title = json_obj.data_arr.pdf_title_first_line + ' - ' + json_obj.data_arr.pdf_title_second_line;
+				$( '#trade_reports_table' ).DataTable( {
+					language: {search: ""},
+					paging: false,
+					info: false,
+					dom: 'Bfrtip',
+					buttons: [
+						{
+							extend: 'excelHtml5',
+							orientation: 'landscape',
+							filename: file_name,
+							messageTop: top_massage,
+							title: excel_title
+						},
+						{
+							extend: 'pdfHtml5',
+							orientation: 'landscape',
+							filename: file_name,
+							messageTop: top_massage,
+							title: pdf_title
+						}
+					],
+					"order": [[ 0, "desc" ]],
+					"scrollX": true
+				} );
+
+				$( '.buttons-html5' ).addClass( 'btn btn-secondary' );
+				$( '#trade_reports_table_filter input' ).addClass( 'form-control' ).attr( "placeholder", "Search" ).css( 'margin', 0 );
+				$( '#trade_reports_table_filter' ).width( 210 ).css( 'float', 'right' );
+				$( '.dt-buttons' ).width( 200 ).css( 'float', 'left' );
+				if( $( document ).width() < 992 ){
+					$( '#trade_reports_table_filter' ).width( '100%' ).addClass( 'text-left mt-2' );
+					$( '#trade_reports_table_filter input' ).width( '100%' );
+				}
+
+				// $( '#activity_table_filter label' ).after( '<small id="search_note" class="form-text text-muted" style="margin-top: -0.5em">Enter EXACTLY what you\'re looking for</small>' );
+
+
+				$( "#trade_reports_boxes_container_div" ).html( json_obj.data_arr['trade_reports_boxes'] );
+				$( ".server_response_div .alert" ).removeClass( 'alert-warning alert-danger' ).addClass( 'alert-success' ).text( 'Table generated successfully.' ).show();
+			}else{ //If there is an error
+				$( ".server_response_div .alert" ).text( json_obj.error_message ).show();
+				if( json_obj.error_level == 0 ){
+					$( ".server_response_div .alert" ).removeClass( 'alert-success alert-danger' ).addClass( 'alert-warning' );
+				}else{
+					$( ".server_response_div .alert" ).removeClass( 'alert-success alert-warning' ).addClass( 'alert-danger' );
+				}
+			}
+			window.setTimeout(function() {
+				$(".alert-success, .alert-danger, .alert-warning").slideUp();
+			}, 4000);
+		} );
+	} );
+    $( "#ytd_earnings_form" ).submit( function( event ){
+		event.preventDefault(); //Prevent the form from submitting normally
+		$.post( 'junction.php', $( '#ytd_earnings_form' ).serialize(), function( data ){
+			var json_obj = $.parseJSON( data );
+			if( json_obj.status == true ){
+				$( "#ytd_earnings_table" ).DataTable().destroy();
+				$( "#ytd_earnings_table tbody" ).html( json_obj.data_arr['ytd_earnings_table'] );
+
+				var currentDate = new Date();
+				var top_massage = 'Created: ' + (currentDate.getMonth()+1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear() + ' ' + currentDate.getHours() + ':' + currentDate.getMinutes();
+				const months_names = ["January", "February", "March", "April", "May", "June",
+					"July", "August", "September", "October", "November", "December"
+				];
+				var file_name = 'Year to Date Earnings' + currentDate.getDate() + ' ' + months_names[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+				var pdf_title = json_obj.data_arr.pdf_title_first_line + '\n\r' + json_obj.data_arr.pdf_title_second_line;
+				var excel_title = json_obj.data_arr.pdf_title_first_line + ' - ' + json_obj.data_arr.pdf_title_second_line;
+				$( '#ytd_earnings_table' ).DataTable( {
+					language: {search: ""},
+					paging: false,
+					info: false,
+					dom: 'Bfrtip',
+					buttons: [
+						{
+							extend: 'excelHtml5',
+							orientation: 'landscape',
+							filename: file_name,
+							messageTop: top_massage,
+							title: excel_title
+						},
+						{
+							extend: 'pdfHtml5',
+							orientation: 'landscape',
+							filename: file_name,
+							messageTop: top_massage,
+							title: pdf_title
+						}
+					],
+					"order": [[ 0, "desc" ]],
+					"scrollX": true
+				} );
+
+				$( '.buttons-html5' ).addClass( 'btn btn-secondary' );
+				$( '#ytd_earnings_table_filter input' ).addClass( 'form-control' ).attr( "placeholder", "Search" ).css( 'margin', 0 );
+				$( '#ytd_earnings_table_filter' ).width( 210 ).css( 'float', 'right' );
+				$( '.dt-buttons' ).width( 200 ).css( 'float', 'left' );
+				if( $( document ).width() < 992 ){
+					$( '#ytd_earnings_table_filter' ).width( '100%' ).addClass( 'text-left mt-2' );
+					$( '#ytd_earnings_table_filter input' ).width( '100%' );
+				}
+
+				// $( '#activity_table_filter label' ).after( '<small id="search_note" class="form-text text-muted" style="margin-top: -0.5em">Enter EXACTLY what you\'re looking for</small>' );
+
+
+				$( "#ytd_earnings_boxes_container_div" ).html( json_obj.data_arr['ytd_earnings_boxes'] );
+				$( ".server_response_div .alert" ).removeClass( 'alert-warning alert-danger' ).addClass( 'alert-success' ).text( 'Table generated successfully.' ).show();
+			}else{ //If there is an error
+				$( ".server_response_div .alert" ).text( json_obj.error_message ).show();
+				if( json_obj.error_level == 0 ){
+					$( ".server_response_div .alert" ).removeClass( 'alert-success alert-danger' ).addClass( 'alert-warning' );
+				}else{
+					$( ".server_response_div .alert" ).removeClass( 'alert-success alert-warning' ).addClass( 'alert-danger' );
+				}
+			}
+			window.setTimeout(function() {
+				$(".alert-success, .alert-danger, .alert-warning").slideUp();
+			}, 4000);
+		} );
+	} );
 
 	/**
 	 Dashboard time priod form - changed selection.

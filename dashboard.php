@@ -73,8 +73,8 @@ require_once 'header.php';
 
 						?>
 						<canvas id="dashboard_pie_chart"></canvas>
-						<script type="text/javascript" src="pie_chart_no_data.js"
-						        chart_id="dashboard_pie_chart"></script>
+						<script type="text/javascript" chart_id="dashboard_pie_chart" src="pie_chart_no_data.js"
+						        ></script>
 						<script type="text/javascript">
 							var pie_charts_arr = [];
 							pie_charts_arr.push( pie_chart );
@@ -96,8 +96,7 @@ require_once 'header.php';
 						<h4 class="card-title mb-0">Commission Statement</h4>
 					</div>
 					<div class="card-body">
-						<object id="statement_pdf_object" data="none" type="application/pdf" height="260px"
-						        width="100%"></object>
+						<object id="statement_pdf_object" data="none" type="application/pdf" height="260px"  width="100%"></object>
 						<?php
 						$x = statement::statements_list("{$_SESSION['company_name']}/data"); //x doesn't matter, initial the function for $_SESSION['first_statement_url']
 						echo statement::statement_buttons_pdf_url_changer();
@@ -127,7 +126,7 @@ require_once 'header.php';
 								<option value="Last Year">Last Year</option>
 								<option value="Last Month">Last Month</option>
 							</select>
-							<input name="choose_date_radio" value="dateTrade" hidden>
+							<input name="choose_date_radio" value="date" hidden>
 							<input name="choose_pay_radio" value="rep_comm" hidden>
 							<input name="class" value="no_class" hidden>
 							<input name="func" value="reports_update" hidden>
@@ -161,45 +160,22 @@ require_once 'header.php';
 				</div>
 				<div class="card">
 					<div class="card-header">
-						<h4 class="card-title mb-0">Net Commissions by Product Category</h4>
+						<h4 class="card-title mb-0">Top 10 Sponsors</h4>
 					</div>
 					<div class="card-body">
 						<div style="min-height: 300px">
 							<?php
-							try{
-								$json_obj       = pie_chart_data_and_labels('reports_pie_chart', [
-									'time_period'       => 'Year to Date',
-									'choose_date_radio' => 'dateTrade',
-									'choose_pay_radio'  => 'rep_comm'
-								]);
-								$pie_chart_data = $json_obj->data_arr['pie_chart_data'];
-								echo "<script type='text/javascript'>
-										var pie_chart_data = $pie_chart_data;
-									</script>";
-							}catch(Exception $e){
-								catch_doc_first_load_exception($e, 'dashboard_time_period_form');
-								echo "<script type='text/javascript'>
-										pie_chart_data = '';
-									</script>";
-							}
-							?>
-							<canvas id="dashboard_pie_chart_2"></canvas>
-							<script type="text/javascript" src="pie_chart_no_data.js"
-							        chart_id="dashboard_pie_chart_2"></script>
-							<script type="text/javascript">
-								pie_charts_arr.push( pie_chart );
-								pie_charts_arr[1].data = pie_chart_data;
-								pie_charts_arr[1].options.title = {
-									display: true,
-									fontSize: 14,
-									text: "Breakdown by Product Category"
-								};
-								pie_charts_arr[1].update();
-							</script>
+        					try{
+        						$json_obj = dashboard_top_sponsors();
+        						echo $json_obj->data_arr['sponsor_table'];
+        					}catch(Exception $e){
+        						catch_doc_first_load_exception($e, 'reports_form');
+        					}
+        					?>
 						</div>
 					</div>
 					<div class="card-footer text-muted">
-						Click on chart for details
+						Top sponsers on gross commission
 					</div>
 				</div>
 			</div>

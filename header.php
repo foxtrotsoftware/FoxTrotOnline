@@ -1,7 +1,12 @@
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
 <?php
 try{
 	require_once "backstage.php";
-	session_start();
+	//session_start();
 
 	//Check if cookies are in use for log in
 	if(permrep::is_remembered()){
@@ -13,7 +18,7 @@ try{
 	}
 
 	//Security
-	$_GET["company_name"] = addslashes(htmlentities($_GET["company_name"]));
+	$_GET["company_name"] = isset($_GET["company_name"])?addslashes(htmlentities($_GET["company_name"])):'demo';
 
 	//Choose DB
 	if(!isset($_SESSION['db_name']) || ($_SESSION['db_name'] != $_GET["company_name"])){
@@ -38,3 +43,4 @@ try{
 } catch(Exception $e){
 	$GLOBALS['thrown_exception'] = $e->getMessage();
 }
+

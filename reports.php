@@ -43,7 +43,7 @@ require_once 'header.php';
 					<div id="reports_form_dates_radios_div" class="col-xs-2 mr-3 ml-3">
 						<div class="custom-control custom-radio custom-control">
 							<input type="radio" id="trade_date_radio" name="choose_date_radio"
-							       class="custom-control-input" value="dateTrade" checked disabled>
+							       class="custom-control-input" value="date" checked disabled>
 							<label class="custom-control-label" for="trade_date_radio">Trade Date</label>
 						</div>
 						<div class="custom-control custom-radio custom-control">

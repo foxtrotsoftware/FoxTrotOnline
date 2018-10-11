@@ -20,6 +20,7 @@ define('HEAD', '
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 	<!-- ChartJS -->
+    <!--<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
 
 	<!-- Custom CSS and JS -->
@@ -41,7 +42,9 @@ define('HEAD', '
 
 define('EXCEPTION_WARNING_CODE', 0);
 define('EXCEPTION_DANGER_CODE', 1);
-define('PIE_CHART_COLORS_ARRAY', [
+$GLOBALS['PIE_CHART_COLORS_ARRAY'] = array('rgb(38, 70, 83)','rgb(42, 157, 143)','rgb(233, 196, 106)','rgb(244, 162, 97)','rgb(231, 111, 81)','rgb(144, 78, 85)','rgb(191, 180, 143)','rgb(50, 50, 50)','rgb(200, 200, 200)');
+
+/*define('PIE_CHART_COLORS_ARRAY', [
 	'rgb(38, 70, 83)',
 	'rgb(42, 157, 143)',
 	'rgb(233, 196, 106)',
@@ -51,7 +54,7 @@ define('PIE_CHART_COLORS_ARRAY', [
 	'rgb(191, 180, 143)',
 	'rgb(50, 50, 50)',
 	'rgb(200, 200, 200)'
-]);
+]);*/
 
 /**
  * Connect to DB
@@ -63,7 +66,7 @@ function db_connect(){
 
 	// Create connection
 	//For local connection
-	$conn = new mysqli("127.0.0.1:3304", 'root', 'alonba2358', $_SESSION['db_name']);
+	$conn = new mysqli("localhost", 'demo_foxtrot', 'demo_foxtrot', $_SESSION['db_name']);
 
 	//For online connection:
 	//	if(isset($_SESSION['db_host'])){
@@ -116,7 +119,7 @@ function db_choose($post){
 		case 'lafferty':
 			$_SESSION['company_name'] = $post['company_name'];
 			$_SESSION['db_host']      = 'sql5c40n.carrierzone.com';
-			$_SESSION['db_name']      = $post['company_name'].'_jjixgbv9my802728';
+			$_SESSION['db_name']      = $post['company_name'].'_foxtrot';
 			break;
 		default:
 			if(!isset($_SESSION["permrep_obj"])){
@@ -163,6 +166,13 @@ HEREDOC_STRING;
  */
 function show_sidebar($current_page){
 	${$current_page."_active"} = 'active';
+    $dashboard_active = isset($dashboard_active)?$dashboard_active:'';
+    $statements_active = isset($statements_active)?$statements_active:'';
+    $activity_active = isset($activity_active)?$activity_active:'';
+    $reports2_active = isset($reports2_active)?$reports2_active:'';
+    $reports_active = isset($reports_active)?$reports_active:'';
+    $documents_active = isset($documents_active)?$documents_active:'';
+    
 	$html_return_str           = '
 		<nav class="col-md-2 d-none d-md-block bg-light sidebar">
 			<ul class="nav flex-column">
@@ -182,6 +192,12 @@ function show_sidebar($current_page){
 					<a class="nav-link '.$activity_active.'" href="activity.php">
 						'.show_sidebar_icon('bar_chart').'
 						Activity
+					</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link '.$reports2_active.'" href="reports2.php">
+                        '.show_sidebar_icon('paper').'
+						Reports
 					</a>
 				</li>
 				<li class="nav-item">
@@ -314,6 +330,7 @@ class statement{
 	 * @return string
 	 */
 	static function statements_list($dir){
+	   $html_return_str = '';
 		$files_array = scandir($dir);
 
 		//Remove unnecessary array items.
@@ -329,7 +346,7 @@ class statement{
 		$file_obj_array = self::sort_pdf_array_by_date($file_obj_array);
 
 		foreach($file_obj_array as $file_obj){
-			$option_content = "{$file_obj->year} {$file_obj->month} {$file_obj->payroll_sequence} Payroll {$file_obj->field_1}";
+			$option_content = "{$file_obj->year} {$file_obj->month} {$file_obj->payroll_sequence} Payroll";//{$file_obj->field_1} removed from option content-aksha(27-09-2018)
 			switch($_SESSION['company_name']){
 				case 'concorde':
 					if($file_obj->concorde_company_number == 2){
@@ -475,8 +492,8 @@ class permrep{
 	public $sal_no;
 	public $username;
 	public $accessLevel;
-	public $customerID;
-	public $lastModifiedDate;
+	public $customerid;
+	public $edit_date;
 	public $bnd_states;
 	public $opt_states;
 	public $rep_link;
@@ -529,7 +546,7 @@ class permrep{
 		$_SESSION['permrep_obj'] = $this;
 
 		//Remember me (put cookies on computer)
-		if($post['remember_me'] == 'on'){
+		if(isset($post['remember_me']) && $post['remember_me'] == 'on'){
 			setcookie('foxtrot_online_password', md5($this->webpswd), time() + (86400 * 7), "/");
 			setcookie('foxtrot_online_username', $this->username, time() + (86400 * 7), "/");
 		}
@@ -578,10 +595,10 @@ class permrep{
 	 * Checks if there are saved cookies with the credentials.
 	 * If so - return true.
 	 * If not - redirect to log in page.
-	 */
+	 */    
 	static function is_remembered(){
 		if(isset($_COOKIE['foxtrot_online_username']) && isset($_COOKIE['foxtrot_online_password'])){
-			$_GET["company_name"] = addslashes(htmlentities($_GET["company_name"]));
+			$_GET["company_name"] = isset($_GET["company_name"])?addslashes(htmlentities($_GET["company_name"])):'demo';
 			$company_arr          = array('company_name' => $_GET["company_name"]);
 			db_choose($company_arr);
 			db_connect(); //open DB connection
@@ -611,13 +628,66 @@ class permrep{
  * @return string
  * @throws exception
  */
+function dashboard_top_sponsors()
+{
+    $where_clause = '';   
+    
+    $sql_str = "SELECT t.`comm_rec` as gross_commission,c.`company` as sponsor
+                FROM trades as t
+                LEFT JOIN company as c on c.company_id=t.co_no
+                WHERE t.rep_no = {$_SESSION["permrep_obj"]->permRepID}
+                ORDER BY t.comm_rec DESC limit 10";
+    /*$sql_str = "SELECT MAX(t.comm_rec) as gross_commission
+					FROM trades as t
+                    WHERE rep_no = {$_SESSION["permrep_obj"]->permRepID}
+					$where_clause limit 10;";*/
+    $result = db_query($sql_str);
+    $html_table_string = "<table class='main-table table table-hover table-striped table-sm'>
+						<thead>
+						<tr>
+							<th>Sponsor Name</th>
+							<th class='text-right'>Gross Commission Amount</th>
+						</tr>
+						</thead>
+						<tbody>";    
+        
+    if($result->num_rows != 0){
+        while($row = $result->fetch_assoc()){
+        
+            $html_table_string .= "<tr>
+    						<td>{$row['sponsor']}</td>
+    						<td class='text-right'>\${$row['gross_commission']}</td>
+    						</tr>";    
+        }        
+    }
+    else
+    {
+        $html_table_string .= "<tr>
+						<td colspan='3'>No relevant records were found.</td>
+                        </tr>";
+					
+            
+    }        
+
+
+	$html_table_string .= '</tbody>
+				</table>';
+    $json_obj->data_arr['sponsor_table'] = $html_table_string;
+    return $json_obj;
+    
+}  
 function pie_chart_data_and_labels($chart_name, $post = array(
 	'time_period'       => 'all_dates',
-	'choose_date_radio' => 'dateTrade',
+	'choose_date_radio' => 'date',
 	'choose_pay_radio'  => 'rep_comm'
 )){
+    $where_clause = '';
+    $reports_table_html = '';
+    //$from_date = '';
+    //$to_date = '';
 	switch($chart_name){
 		case 'dashboard_pie_chart':
+            $where_clause ='';
 			if(isset($post["to_date"])){
 				$where_clause = "AND date_rec < '{$post["to_date"]}'";
 			}
@@ -642,6 +712,8 @@ function pie_chart_data_and_labels($chart_name, $post = array(
 			}
 			break;
 		case 'reports_pie_chart':
+            //$from_date = '';
+            //$to_date = '';
 			switch($post['time_period']){
 				case 'all_dates':
 					unset($_SESSION['from_date']);
@@ -705,8 +777,8 @@ function pie_chart_data_and_labels($chart_name, $post = array(
 				throw new Exception("No relevant records were found.", EXCEPTION_WARNING_CODE);
 			}
 
-			$post['from_date']  = $from_date;
-			$post['to_date']    = $to_date;
+			$post['from_date']  = isset($from_date)?$from_date:'';
+			$post['to_date']    = isset($to_date)?$to_date:'';
 			$reports_table_html = reports_table_html($post, $table_data);
 
 			break;
@@ -716,7 +788,7 @@ function pie_chart_data_and_labels($chart_name, $post = array(
 		'datasets' => [
 			[
 				'data'            => $pie_chart_data_values,
-				'backgroundColor' => PIE_CHART_COLORS_ARRAY,
+				'backgroundColor' => $GLOBALS['PIE_CHART_COLORS_ARRAY'],
 				'borderColor'     => 'rgb(255,255,255)',
 				'borderWidth'     => 1
 			],
@@ -742,6 +814,7 @@ function pie_chart_data_and_labels($chart_name, $post = array(
  * @throws exception
  */
 function line_chart_data_and_labels($post){
+    $where_clause = '';
 	if($post["time_period"] == 'all_dates'){
 		unset($_SESSION['from_date']);
 		unset($_SESSION['to_date']);
@@ -753,7 +826,7 @@ function line_chart_data_and_labels($post){
 		$_SESSION['to_date']   = $to_date;
 	}
 	if(!isset($post["choose_date_radio"])){
-		$post["choose_date_radio"] = 'dateTrade';
+		$post["choose_date_radio"] = 'date';
 	}
 	if(!isset($post["choose_pay_radio"])){
 		$post["choose_pay_radio"] = 'rep_comm';
@@ -844,6 +917,7 @@ function line_chart_data_and_labels($post){
  * @throws exception
  */
 function reports_table_html($post, $original_table_data){
+    $growth_cell = '';
 	switch($post['time_period']){ //find the Last values
 		case 'all_dates':
 			break;
@@ -872,7 +946,7 @@ function reports_table_html($post, $original_table_data){
 	}
 
 	if(isset($last_from_date) && isset($last_to_date)){
-		$where_clause = "AND dateTrade > '$last_from_date' AND dateTrade < '$last_to_date'";
+		$where_clause = "AND date > '$last_from_date' AND date < '$last_to_date'";
 		$sql_str      = "SELECT SUM(rep_comm) AS total_commission, trades.inv_type, prodtype.product
 					FROM trades
 					RIGHT JOIN prodtype ON trades.inv_type = prodtype.inv_type
@@ -921,7 +995,7 @@ function reports_table_html($post, $original_table_data){
 	$i          = 0;
 	$table_data = (isset($table_data)) ? $table_data : $original_table_data;
 	foreach($table_data as $product => $values_arr){
-		$color = PIE_CHART_COLORS_ARRAY[$i];
+		$color = $GLOBALS['PIE_CHART_COLORS_ARRAY'][$i];
 		$i++;
 		if(isset($last_values)){
 			if($values_arr[0] == $values_arr[1]){
@@ -929,8 +1003,12 @@ function reports_table_html($post, $original_table_data){
 				$growth     = '0%';
 			} elseif($values_arr[0] > $values_arr[1]){ //if the total is bigger than the last
 				$text_class = 'text-success';
-				$growth     = round(100 * ($values_arr[0] / $values_arr[1]), 2);
-				if(is_infinite($growth)){
+                if($values_arr[0] != '0' && $values_arr[1] != '0'){
+				    $growth     = round(100 * ($values_arr[0] / $values_arr[1]), 2);//change for devided by zero aksha(27-09-2018)
+                }else{
+                    $growth = '0';
+                }
+                if(is_infinite($growth)){
 					$growth = '<larger>---</larger>';
 				} else{
 					$growth = $growth.'%';
@@ -978,6 +1056,7 @@ function reports_table_html($post, $original_table_data){
  * @throws exception
  */
 function dashboard_posted_commissions($to_date = null){
+    $where_clause = '';
 	if($to_date != null){
 		$where_clause = "AND date_rec < '$to_date'";
 	}
@@ -1071,7 +1150,7 @@ function number_to_ordinal_suffix($number){
 function drill_down_pie_chart($post){
 	switch($post["chart_id"]){ //Choose relevant chart and create SQL
 		case 'dashboard_pie_chart':
-			$sql_str = "SELECT dateTrade, comm_rec, rep_comm
+			$sql_str = "SELECT date, comm_rec, rep_comm
 					FROM trades
 					RIGHT JOIN prodtype ON trades.inv_type = prodtype.inv_type
 					WHERE rep_no = {$_SESSION["permrep_obj"]->permRepID}
@@ -1079,22 +1158,22 @@ function drill_down_pie_chart($post){
 						AND date_rec IS NOT NULL
 						AND date_rec < '{$post["dashboard_form_date"]}'
 						AND product = '{$post["label"]}'
-					ORDER BY dateTrade DESC;";
+					ORDER BY date DESC;";
 			break;
 		case 'dashboard_pie_chart_2':
-			$post["date_type"] = 'dateTrade';
+			$post["date_type"] = 'date';
 		case 'reports_pie_chart':
 			if(isset($_SESSION["from_date"]) && isset($_SESSION["to_date"])){
 				$where_clause = "AND {$post["date_type"]} > '{$_SESSION["from_date"]}' AND {$post["date_type"]} < '{$_SESSION["to_date"]}'";
 			}
-			$sql_str = "SELECT dateTrade, date_rec, comm_rec, rep_comm
+			$sql_str = "SELECT date, date_rec, comm_rec, rep_comm
 					FROM trades
 					RIGHT JOIN prodtype ON trades.inv_type = prodtype.inv_type
 					WHERE rep_no = {$_SESSION["permrep_obj"]->permRepID}
 					AND (comm_rec > 0 OR rep_comm > 0)
 					$where_clause
 					AND product = '{$post["label"]}'
-					ORDER BY dateTrade DESC;";
+					ORDER BY date DESC;";
 			break;
 	}
 
@@ -1108,7 +1187,7 @@ function drill_down_pie_chart($post){
 	$headers               = $result->fetch_fields();
 	foreach($headers as $col_obj){
 		switch($col_obj->name){
-			case 'dateTrade':
+			case 'date':
 				$header = 'Trade Date';
 				break;
 			case 'date_rec':
@@ -1134,7 +1213,7 @@ function drill_down_pie_chart($post){
 		while($row = $result->fetch_assoc()){ //Fill up all properties from DB data
 			$drill_down_table_html .= "<tr>";
 			foreach($row as $column_name => $value){
-				if($column_name == 'dateTrade' || $column_name == 'date_rec'){
+				if($column_name == 'date' || $column_name == 'date_rec'){
 					if($value != null && $value != '0000-00-00 00:00:00'){
 						$value = date('m/d/Y', strtotime($value));
 					} else{
@@ -1227,27 +1306,45 @@ function logo_html_modal(){
  * @return json_obj
  * @throws Exception
  */
+/**
+ * activity_update()
+ * 
+ * @param mixed $post
+ * @param bool $create_boxes_flag
+ * @param bool $create_table_flag
+ * @return
+ */
 function activity_update($post, $create_boxes_flag = true, $create_table_flag = true){
 	//Activity table:
+    $where_clause = '';//defined change by aksha(27-09-2018)
+    $table_html_return_str = '';
+    $pdf_title_dates = '';
+    $pdf_title_first_line = '';
+    $from_date = isset($post['from_date'])?$post['from_date']:'';
+    $to_date = isset($post['to_date'])?$post['to_date']:'';
+    $boxes_html_return_str = '';
+    $all_dates = isset($post['all_dates'])?$post['all_dates']:'';
+    $sql_str = '';
+
 	if($create_table_flag){
-		if($post['from_date'] > $post['to_date']){
+		if($from_date > $to_date){
 			throw new Exception("Start date cannot be after the end date.", EXCEPTION_WARNING_CODE);
 		}
 
-		if(isset($post["from_date"]) && isset($post["to_date"]) && $post['all_dates'] != 'on'){
-			$where_clause     = "AND dateTrade > '{$post['from_date']}' AND dateTrade < '{$post['to_date']}'";
-			$export_from_date = date_format(date_create($post['from_date']), 'm/d/Y');
-			$export_to_date   = date_format(date_create($post['to_date']), 'm/d/Y');
+		if(isset($post["from_date"]) && isset($post["to_date"]) && $all_dates != 'on'){
+			$where_clause     = "AND date > '{$from_date}' AND date < '{$to_date}'";
+			$export_from_date = date_format(date_create($from_date), 'm/d/Y');
+			$export_to_date   = date_format(date_create($to_date), 'm/d/Y');
 			$pdf_title_dates  = "$export_from_date to $export_to_date";
 		} else{
 			$pdf_title_dates = 'All Trades';
 		}
 
-		if($post['from_date'] == $post['to_date'] && isset($post["from_date"]) && isset($post["to_date"]) && isset($post['all_dates'])){
-			$post['from_date'] = substr_replace($post['from_date'], ' 00:00:00', 10);
-			$post['to_date']   = substr_replace($post['to_date'], ' 23:59:59', 10);
+		if($from_date == $to_date && isset($from_date) && isset($post["to_date"]) && isset($post['all_dates'])){
+			$from_date = substr_replace($from_date, ' 00:00:00', 10);
+			$to_date   = substr_replace($to_date, ' 23:59:59', 10);
 		} else{
-			$sql_str = "SELECT dateTrade, date_rec, clearing, cli_name, invest, cusip_no, net_amt, comm_exp, comm_rec, rep_rate, rep_comm, pay_date
+			$sql_str = "SELECT date, date_rec, clearing, cli_name, invest, cusip_no, net_amt, comm_exp, comm_rec, rep_rate, rep_comm, pay_date
 					FROM trades
 					WHERE rep_no = {$_SESSION["permrep_obj"]->permRepID}
 					$where_clause;";
@@ -1276,7 +1373,7 @@ function activity_update($post, $create_boxes_flag = true, $create_table_flag = 
 							$formatted_value                 = number_format(floatval($value), 2);
 							$table_html_return_str .= "<td data-search='$value' data-order='$value' class='text-right'>\$$formatted_value</td>";
 							break;
-						case 'dateTrade':
+						case 'date':
 						case 'date_rec':
 						case 'pay_date':
 							if($value != null && $value != '0000-00-00 00:00:00'){
@@ -1303,7 +1400,7 @@ function activity_update($post, $create_boxes_flag = true, $create_table_flag = 
 
 	//Activity Boxes:
 	if($create_boxes_flag){
-
+    
 		//Trail Commissions
 		$sql_str = "SELECT SUM(comm_rec) as total_commission, rep_no
 				FROM trades
@@ -1375,7 +1472,352 @@ function activity_update($post, $create_boxes_flag = true, $create_table_flag = 
 
 	return $json_obj;
 }
+function hold_trades_update($post, $create_boxes_flag = true, $create_table_flag = true){//For report page by aksha(29-09-2018)
+	//Activity table:
+    $where_clause = '';//defined change by aksha(27-09-2018)
+    $table_html_return_str = '';
+    $pdf_title_dates = '';
+    $pdf_title_first_line = '';
+    $from_date = isset($post['trade_reports_from_date'])?$post['trade_reports_from_date']:'';
+    $to_date = isset($post['trade_reports_to_date'])?$post['trade_reports_to_date']:'';
+    $boxes_html_return_str = '';
+    $all_dates = isset($post['trade_reports_all_dates'])?$post['trade_reports_all_dates']:'';
+    $sql_str = '';
 
+	if($create_table_flag){
+		if($from_date > $to_date){
+			throw new Exception("Start date cannot be after the end date.", EXCEPTION_WARNING_CODE);
+		}
+
+		if(isset($post["trade_reports_from_date"]) && isset($post["trade_reports_to_date"]) && $all_dates != 'on'){
+			$where_clause     = "AND date > '{$from_date}' AND date < '{$to_date}'";
+			$export_from_date = date_format(date_create($from_date), 'm/d/Y');
+			$export_to_date   = date_format(date_create($to_date), 'm/d/Y');
+			$pdf_title_dates  = "$export_from_date to $export_to_date";
+		} else{
+			$pdf_title_dates = 'All Trades';
+		}
+
+		if($from_date == $to_date && isset($from_date) && isset($post["trade_reports_to_date"]) && isset($post['trade_reports_all_dates'])){
+			$from_date = substr_replace($from_date, ' 00:00:00', 10);
+			$to_date   = substr_replace($to_date, ' 23:59:59', 10);
+		} else{
+			$sql_str = "SELECT date, date_rec, clearing, cli_name, invest, cusip_no, net_amt, comm_exp, comm_rec, rep_rate, rep_comm, pay_date
+					FROM trades
+					WHERE hold=1 and rep_no = {$_SESSION["permrep_obj"]->permRepID}
+					$where_clause;";
+        }
+
+		$result = db_query($sql_str);
+		if($result->num_rows != 0){
+			while($row = $result->fetch_assoc()){
+				$table_html_return_str .= "<tr>";
+				foreach($row as $col => $value){
+					switch($col){
+						case 'cli_name':
+						case 'invest':
+						case 'clearing':
+						case 'cusip_no':
+							$table_html_return_str .= "<td class='text-left'>$value</td>";
+							break;
+						case 'rep_rate':
+							$value                 = number_format(floatval($value) * 100, 2);
+							$table_html_return_str .= "<td class='text-right'>$value%</td>";
+							break;
+						case 'net_amt':
+						case 'comm_rec':
+						case 'rep_comm':
+						case 'comm_exp':
+							$formatted_value                 = number_format(floatval($value), 2);
+							$table_html_return_str .= "<td data-search='$value' data-order='$value' class='text-right'>\$$formatted_value</td>";
+							break;
+						case 'date':
+						case 'date_rec':
+						case 'pay_date':
+							if($value != null && $value != '0000-00-00 00:00:00'){
+								$value_timestamp = strtotime($value);
+								$value                 = date('m/d/Y', $value_timestamp);
+								$table_html_return_str .= "<td data-order='$value_timestamp' class='text-left'>$value</td>";
+							} else{
+								$table_html_return_str .= "<td>-</td>";
+							}
+							break;
+						default:
+							$table_html_return_str .= "<td>$value</td>";
+							break;
+					}
+				}
+				$table_html_return_str .= "</tr>";
+				$broker_name           = ucfirst(strtolower($_SESSION['permrep_obj']->fname)).' '.ucfirst(strtolower($_SESSION['permrep_obj']->lname));
+				$pdf_title_first_line  = "Transaction On Hold for $broker_name";
+			}
+            //print_r($sql_str);exit;
+		} else{
+			throw new Exception("No relevant records were found.", EXCEPTION_WARNING_CODE);
+		}
+	}
+    //print_r($table_html_return_str);exit;
+
+    $json_obj                                    = new json_obj();
+	$json_obj->data_arr['trade_reports_table']        = $table_html_return_str;
+	$json_obj->data_arr['pdf_title_first_line']  = $pdf_title_first_line;
+	$json_obj->data_arr['pdf_title_second_line'] = $pdf_title_dates;
+	$json_obj->status                            = true;
+
+	return $json_obj;
+}
+function ytd_earnings($post, $create_boxes_flag = true, $create_table_flag = true){//For report page by aksha(04-10-2018)
+	//Activity table:
+    $where_clause = '';//defined change by aksha(27-09-2018)
+    $table_html_return_str = '';
+    $pdf_title_dates = '';
+    $pdf_title_first_line = '';
+    $from_date = isset($post['ytd_earnings_from_date'])?$post['ytd_earnings_from_date']:'';
+    $to_date = isset($post['ytd_earnings_to_date'])?$post['ytd_earnings_to_date']:'';
+    $boxes_html_return_str = '';
+    $all_dates = isset($post['ytd_earnings_all_dates'])?$post['ytd_earnings_all_dates']:'';
+    $sql_str = '';
+
+	if($create_table_flag){
+		if($from_date > $to_date){
+			throw new Exception("Start date cannot be after the end date.", EXCEPTION_WARNING_CODE);
+		}
+
+		if(isset($post["ytd_earnings_from_date"]) && isset($post["ytd_earnings_to_date"]) && $all_dates != 'on'){
+			$where_clause     = "AND date > '{$from_date}' AND date < '{$to_date}'";
+			$export_from_date = date_format(date_create($from_date), 'm/d/Y');
+			$export_to_date   = date_format(date_create($to_date), 'm/d/Y');
+			$pdf_title_dates  = "$export_from_date to $export_to_date";
+		} else{
+			$pdf_title_dates = 'All Payrolls';
+		}
+
+		if($from_date == $to_date && isset($from_date) && isset($post["ytd_earnings_to_date"]) && isset($post['ytd_earnings_all_dates'])){
+			$from_date = substr_replace($from_date, ' 00:00:00', 10);
+			$to_date   = substr_replace($to_date, ' 23:59:59', 10);
+		} else{
+			$sql_str = "SELECT date as payroll_date, check_amt as check_amount, pay_gross as gross_amount
+					FROM 1099_earnings
+					WHERE rep_no = {$_SESSION["permrep_obj"]->permRepID}
+					$where_clause;";
+        }
+
+		$result = db_query($sql_str);
+		if($result->num_rows != 0){
+			while($row = $result->fetch_assoc()){
+				$table_html_return_str .= "<tr>";
+				foreach($row as $col => $value){
+					switch($col){
+					    case 'payroll_date':
+							if($value != null && $value != '0000-00-00 00:00:00'){
+								$value_timestamp = strtotime($value);
+								$value                 = date('m/d/Y', $value_timestamp);
+								$table_html_return_str .= "<td data-order='$value_timestamp' class='text-left'>$value</td>";
+							} else{
+								$table_html_return_str .= "<td>-</td>";
+							}
+							break;
+						case 'check_amount':
+						case 'gross_amount':
+							$formatted_value                 = number_format(floatval($value), 2);
+							$table_html_return_str .= "<td data-search='$value' data-order='$value' class='text-right'>\$$formatted_value</td>";
+							break;
+						
+						default:
+							$table_html_return_str .= "<td>$value</td>";
+							break;
+					}
+				}
+				$table_html_return_str .= "</tr>";
+				$broker_name           = ucfirst(strtolower($_SESSION['permrep_obj']->fname)).' '.ucfirst(strtolower($_SESSION['permrep_obj']->lname));
+				$pdf_title_first_line  = "Year to Date Earnings for $broker_name";
+			}
+            //print_r($sql_str);exit;
+		} else{
+			throw new Exception("No relevant records were found.", EXCEPTION_WARNING_CODE);
+		}
+	}
+    //print_r($table_html_return_str);exit;
+
+    $json_obj                                    = new json_obj();
+	$json_obj->data_arr['ytd_earnings_reports_table']        = $table_html_return_str;
+	$json_obj->data_arr['pdf_title_first_line']  = $pdf_title_first_line;
+	$json_obj->data_arr['pdf_title_second_line'] = $pdf_title_dates;
+	$json_obj->status                            = true;
+
+	return $json_obj;
+}
+function current_licensing_header(){//For current licence dynemic category header by aksha(04-10-2018)
+	
+	    $table_html_return_str = '';
+        $table_html_return_str = "<th>STATES</th>";
+        
+        $sql_str = "SELECT product,abbrev FROM `prodtype`";
+        $result = db_query($sql_str);
+        if($result->num_rows != 0){
+			while($row = $result->fetch_assoc()){
+			     if($row['abbrev'] == 'LP')
+                 {
+                    $value = isset($row['product'])?$row['product']:'';
+			        $table_html_return_str .= "<th>$value</th>";
+    			 }
+                 else if($row['abbrev'] == 'MF')
+                 {
+                    $value = isset($row['product'])?$row['product']:'';
+			        $table_html_return_str .= "<th>$value</th>";
+                 }
+                 else if($row['abbrev'] == 'S')
+                 {
+                    $value = isset($row['product'])?$row['product']:'';
+			        $table_html_return_str .= "<th>$value</th>";
+                 }
+                 else if($row['abbrev'] == 'VA')
+                 {
+                    $value = isset($row['product'])?$row['product']:'';
+			        $table_html_return_str .= "<th>$value</th>";
+                 }
+                 else if($row['abbrev'] == 'FA')
+                 {
+                    $value = isset($row['product'])?$row['product']:'';
+			        $table_html_return_str .= "<th>$value</th>";
+                 }
+                 else if($row['abbrev'] == 'L')
+                 {
+                    $value = isset($row['product'])?$row['product']:'';
+			        $table_html_return_str .= "<th>$value</th>";
+                 }
+                 else if($row['abbrev'] == 'RIA')
+                 {
+                    $value = isset($row['product'])?$row['product']:'';
+			        $table_html_return_str .= "<th>$value</th>";
+                 }
+            }
+            //print_r($sql_str);exit;
+		} else{
+			throw new Exception("No relevant records were found.", EXCEPTION_WARNING_CODE);
+		}
+	
+    //print_r($table_html_return_str);exit;
+
+    $json_obj                                    = new json_obj();
+	$json_obj->data_arr['current_licensing_header']= $table_html_return_str;
+	$json_obj->status                            = true;
+
+	return $json_obj;
+}
+function current_licensing($post, $create_boxes_flag = true, $create_table_flag = true){//For current licensing page by aksha(04-10-2018)
+	//Activity table:
+    $where_clause = '';//defined change by aksha(04-10-2018)
+    $table_html_return_str = '';
+    $pdf_title_dates = '';
+    $pdf_title_first_line = '';
+    $boxes_html_return_str = '';
+    $sql_str = '';
+
+	if($create_table_flag){
+		
+		$sql_str = "SELECT stateid,statename
+				FROM states";
+        $result = db_query($sql_str);
+		if($result->num_rows != 0){
+			while($row = $result->fetch_assoc()){
+				$table_html_return_str .= "<tr>";
+                $state_name = isset($row['statename'])?$row['statename']:'';
+                $state_id = isset($row['stateid'])?$row['stateid']:'';
+                
+                $sql_str_ = "SELECT *
+					FROM permrep
+					WHERE permRepID = {$_SESSION["permrep_obj"]->permRepID}";
+				$result_ = db_query($sql_str_);
+        		if($result_->num_rows != 0){
+        			while($row_ = $result_->fetch_assoc()){
+        			 
+                     $lp_states = isset($row_['lp_states'])?substr($row_['lp_states'],$state_id-1,1):'';
+                     $mut_states = isset($row_['mut_states'])?substr($row_['mut_states'],$state_id-1,1):'';
+                     $sec_states = isset($row_['sec_states'])?substr($row_['sec_states'],$state_id-1,1):'';
+                     $va_states = isset($row_['va_states'])?substr($row_['va_states'],$state_id-1,1):'';
+                     $fa_states = isset($row_['fa_states'])?substr($row_['fa_states'],$state_id-1,1):'';
+                     $l_states = isset($row_['l_states'])?substr($row_['l_states'],$state_id-1,1):'';
+                     $ria_states = isset($row_['ria_states'])?substr($row_['ria_states'],$state_id-1,1):'';
+                     
+                     $table_html_return_str .= "<td style='text-left'>$state_name</td>";
+                     if($lp_states==1)
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='check-mark-3-black.png' height='15px;' width='15px;'></td>";
+                     }
+                     else
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='wrong_checkmark1.png' height='15px;' width='15px;'></td>";
+                     }
+                     if($mut_states==1)
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='check-mark-3-black.png' height='15px;' width='15px;'></td>";
+                     }
+                     else
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='wrong_checkmark1.png' height='15px;' width='15px;'></td>";
+                     }
+                     if($sec_states==1)
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='check-mark-3-black.png' height='15px;' width='15px;'></td>";
+                     }
+                     else
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='wrong_checkmark1.png' height='15px;' width='15px;'></td>";
+                     }
+                     if($va_states==1)
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='check-mark-3-black.png' height='15px;' width='15px;'></td>";
+                     }
+                     else
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='wrong_checkmark1.png' height='15px;' width='15px;'></td>";
+                     }
+                     if($fa_states==1)
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='check-mark-3-black.png' height='15px;' width='15px;'></td>";
+                     }
+                     else
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='wrong_checkmark1.png' height='15px;' width='15px;'></td>";
+                     }
+                     if($l_states==1)
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='check-mark-3-black.png' height='15px;' width='15px;'></td>";
+                     }
+                     else
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='wrong_checkmark1.png' height='15px;' width='15px;'></td>";
+                     }
+                     if($ria_states==1)
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='check-mark-3-black.png' height='15px;' width='15px;'></td>";
+                     }
+                     else
+                     {
+                        $table_html_return_str .= "<td style='text-align:center;font-size:100%;font-weight:bold;'><img src='wrong_checkmark1.png' height='15px;' width='15px;'></td>";
+                     }
+        			 
+        			}
+                }
+                $table_html_return_str .= "</tr>";
+            }
+            $broker_name           = ucfirst(strtolower($_SESSION['permrep_obj']->fname)).' '.ucfirst(strtolower($_SESSION['permrep_obj']->lname));
+            $pdf_title_first_line  = "Current Licencing for $broker_name";
+            
+		} else{
+			throw new Exception("No relevant records were found.", EXCEPTION_WARNING_CODE);
+		}
+	}
+
+    $json_obj                                    = new json_obj();
+	$json_obj->data_arr['current_licensing_reports_table']        = $table_html_return_str;
+	$json_obj->data_arr['pdf_title_first_line']  = $pdf_title_first_line;
+    //$json_obj->data_arr['pdf_title_second_line'] = $pdf_title_dates;
+	$json_obj->status                            = true;
+
+	return $json_obj;
+}
 /**
  * Updates the reports charts and table
  * @param $post
